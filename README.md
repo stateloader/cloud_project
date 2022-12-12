@@ -15,7 +15,7 @@ After a class mate told me how Waste Management in Trelleborg dispatch vessels m
 
 	(1) Hardware
 
-**MDevice**, from here and throughout the documentation refored to as "the thing", "prototype" or "the device", is an ESP8266 (Wemos D1 mini) in circuit with a distance sensor (HC-SR05). The device is placed over a given vessel (my trash can) in a garbage room (the area under my sink), one of many within an imaginary district (my apartment).
+**MDevice**, from here and throughout the documentation refered to as "the thing", "prototype" or "the device", is an ESP8266 (Wemos D1 mini) in circuit with a distance sensor (HC-SR05). The device is placed over a given vessel (my trash can) in a garbage room (the area under my sink), one of many within an imaginary district (my apartment).
 
 << Picture by deadline >>
 
