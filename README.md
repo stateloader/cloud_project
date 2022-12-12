@@ -36,7 +36,7 @@ After all, vessels come in different sizes and shapes while new standards come a
 
     (3) Security
 
-Unlike the phony device under my sink, a real Waste Management Company might oversee thousands of devices and probably think twice before copy/pasting this kind of sensitive information burn it down to the metal like me. Guess *AWS Key Management Service (AWS KMS)* might suit this second thought well; a service that - among others - pairing identities with certificates and keys digitally and encrypt- and decrypts data flows.
+Unlike the phony device under my sink, a real Waste Management Company might oversee thousands of devices and probably think twice before copy/pasting this kind of sensitive information and burn it to the metal. Guess *AWS Key Management Service (AWS KMS)* might suit this second thought well; a service that centralizes security management while - among others - pairing identities with certificates and keys digitally and encrypt- and decrypts data flows.
 
 << Picture by deadline >>
 	
