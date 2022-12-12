@@ -12,7 +12,6 @@ This is an assignment in IoT and cloud services where I've used a distance senso
 This part turned out to be quite difficult. Close my eyes and outsource the looking part to a led device/dashboard of some sort to tell if it's time to empty the vessel or not is cool but maybe not attached with the most solid use case. Because it's required to implement an API and utilize fetched data, somehow and somewhere, for visualization, I've taken a imaginary approach where I'm a Waste Management Company.
 
 After a class mate told me how Waste Management in Trelleborg dispatch vessels more frequent as the temperature rises I've utilized a temp API for something similar in this project. Yes, it had probably been easier to just connect a temp sensor in circuit with my distance sensor for this but it does job! 
-
 	(1) Hardware
 
 **MDevice**, from here and throughout the documentation refered to as "the thing", "prototype" or "the device", is an ESP8266 (Wemos D1 mini) in circuit with a distance sensor (HC-SR05). The device is placed over a given vessel (my trash can) in a garbage room (the area under my sink), one of many within an imaginary district (my apartment).
@@ -44,14 +43,13 @@ Unlike the phony device under my sink, a real Waste Management Company might ove
 
 Configurations for establishing MQTT connection with "the core's" message broker. Specifies which resources and actions being allowed for a device. These policies governs the device(s) shadows as well, something I've illustrated as a concept in my diagram but not implemented myself yet. A shadow is a digital representation of a device and will store, query, ongoing and desired actions until a device that's, for example offline, going online again.
 
-I've let MDevice be able to publish and subscribe to the cloud. This will ... [documentation ongoing]
+I've let the device be able to publish and subscribe to the cloud. This will ... [documentation ongoing]
 
 <Picture by deadline>
 
 	(5) IoT Topics
     
-The MQTT brooker identifies messages from the topics they're sent to and received from. As for my fictive waste manager company, I've implemented a region/district/garbage_room/device_id/(pub/sub) approach at the moment.
-
+The MQTT brooker identifies messages from the topics they're sent to and received from. As for my fictive waste manager company I've implemented a region/district/garbage_room/device_id/(pub/sub) approach.
 	
 	(6) IoT Rules
 	
