@@ -1,6 +1,7 @@
 Project: Waste Management
 
-![latest_12 drawio](https://user-images.githubusercontent.com/78800629/206992112-0a8391c1-3690-4329-8383-ecfdce5b6baf.png)
+
+![tlted_latest drawio](https://user-images.githubusercontent.com/78800629/206994519-94a6e52e-b879-4147-b2f6-d3783c4bdd7e.png)
 
 	Background
 	
@@ -43,9 +44,7 @@ Unlike the phony device under my sink, a real Waste Management Company might ove
 
 Configurations for establishing MQTT connection with "the core's" message broker. Specifies which resources and actions being allowed for a device. These policies governs the device(s) shadows as well, something I've illustrated as a concept in my diagram but not implemented myself yet. A shadow is a digital representation of a device and will store, query, ongoing and desired actions until a device that's, for example offline, going online again.
 
-I've let MDevice e able to publish, subscribe, X and connect to the cloud.
+I've let MDevice be able to publish and subscribe to the cloud. This will ... [documentation ongoing]
 <Picture by deadline>
 
     (5) IoT Topics
-    
-  [ongoing]
