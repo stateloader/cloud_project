@@ -4,13 +4,13 @@ Project: IoT Waste Management
 
 	Background
 
-This is part of an assignment in **IoT and cloud Services** where I've used a distance sensor for reading current waste level in my household bin. I've since over a year been studying IoT, and by now grown quite tired of playing around with the temp- and humid sensor, and thought this was a brilliant idea. However, figure out a use case turned out to be way more difficult than I first realiaed given the circumstances.
+This is part of an assignment in **IoT and cloud Services** where I've used a distance sensor for reading current waste level in my household bin. I've since a year back been studying IoT, and by now grown quite tired of playing around with the temp- and humid sensor, and thought this was a brilliant idea. However, figure out a use case turned out to be way more difficult than I first realized given the circumstances.
 
 	Use Case
 
-Closing my eyes while throwing the waste and let an interface of some sort remind me when it's time to empty the bin is neat but not really much of a use case. I had to use a little bit of imagination in this one why I've built my architecture trough the lenses of a Waste Management Company. I'm going to refer to this entity as *WMC* in the documentation.
+Closing my eyes while throwing the waste and let an interface of some sort remind me when it's time to take action is neat but not really much of a use case. I had to use a little bit of imagination in this one why I've built my architecture trough the lenses of a Waste Management Company. I'm going to refer to this entity as *WMC* in the documentation.
 
-The idea is simple: devices will publish data to the cloud in which it's being processed and stored. Vessels that's full will trigger the cloud to send a SMS about which vessel, and where it's located, to a garbage collector. We're required to implement an API in this assignment, and after a class mate told me about how Waste Management in southern Sweden emptying vessels more frequent as the temperature rises I've utilized a temp API for something similar in this project. 
+The idea is simple: devices will publish data to the cloud. Vessels that's full will trigger the cloud to send a SMS about which vessel, and where it's located, to a garbage collector. We're required to implement an API in this assignment, and after a class mate told me about a town in southern Sweden in which vessels being dealt with more frequently as the temperature rises I've utilized a temp API for something similar in this project. 
 
 	(1) Hardware
 
@@ -18,22 +18,20 @@ The idea is simple: devices will publish data to the cloud in which it's being p
 
 	(2) Software and API
 
-Most logic in place revolves around the *sensor_value*, *vessel_state* and *update_event* variables whereas sensor_value will determine current vessel_state. If a change occurs, the update_event variable will be set, sent to the cloud and invoke rules that going to trigger the "the core" to execute some actions. There are 3 of these vessel states:
+Most logic in place revolves around the *sensor_value*, *vessel_state* and *update_event* variables whereas *sensor_value* will determine current *vessel_state*. If a change occurs, the *update_event* variable will be set, sent to the cloud and invoke rules that going to trigger the "the core" to execute some actions. There are 3 of these vessel states:
 |  state|definition  |
 |--|--|
 |  green| vessel empty  |
 |  yellow| vessel half full  |
 |  red| vessel full  |
 
-For example; a sensor_value between 35-50 cm might be conditionally attached to state green, 20 - 34 cm to yellow and 0-19 cm red. I wrote *might* because these threshold values are not flashed constants but configurated from the cloud. I've implemented this feature for "long term" purposes.
-
-After all, vessels come in different sizes and shapes while new standards come and go. Instead of making, in this regard, the thing kinda obsolete for every vessel change I thought it might be handy to just publish - "update" - new threshold values to all devices concerned through MQTT commands from the cloud.
+For example; a sensor_value between 35-50 cm might be conditionally attached to state green, 20 - 34 cm to yellow and 0-19 cm red. I wrote *might* because these threshold values are not flashed constants but configurated from the cloud. I've implemented this feature for "long term" purposes. Instead of making, in this regard, the thing kinda obsolete for every vessel change I thought it might be handy to just publish - "update" - new threshold values to all devices concerned through MQTT commands from the cloud.
     
-As API goes I'm utilizing temperatur.nu. They're awesome. The device will request temp data every four hour from a sensor close to where I'm live (the "district") and store this value. If the reading is > 30, we're dealing with temperatures too high for taking "state yellow" into account. I.e: dispatch requests will occur more often.
+As API goes I'm utilizing temperatur.nu. The device will request temp data every four hour from a sensor close to where I'm living (the "district"), a value rest of the logic will take in consideration. If the reading is > 30, we're dealing with temperatures too high for taking "state yellow" into account. I.e: dispatch requests will occur more often.
 
-Yes, it's probably quite a Quasimodo solution in this context to read an api from the device instead of (input anything else) but I just didn't manage to make any API calls from the cloud. First time I'm dealing with cloud services, sure, but such easy task shouldn't be a problem.
+Yes, it's probably quite a Quasimodo solution in this context to read an api from the device instead of (input anything else, why not the cloud...) but I just didn't manage to make any API calls from there (?). My goto was to use lambdas to settle this matter but the platform refused all basic libs (Python) I'm used to. First time I'm working with cloud services, sure, but such easy task shouldn't be a problem.
 
-The flash itself is done from the Arduino-IDE using ESP8266 as target within the board manager.
+The flash itself is done from the Arduino-IDE using ESP8266 as target from the board manager.
 
 ![check_states](https://user-images.githubusercontent.com/78800629/207491443-39f6edac-b5e6-4a5d-8e04-bfe902c1eb0f.png)
 
