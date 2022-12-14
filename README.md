@@ -55,7 +55,7 @@ The MQTT brooker identifies messages from the topics they're sent and received f
 
 Service that's filtering and take actions based on content sent from a device. The filtering is done by parsing incoming messages using SQL syntax. You enter this snippet when creating (or updating) a rule. I've created rules that forwarding every message that has the attribute *update_event* set to a dynamoDB table (warm path) and a S3 bucket (cold path).
 
-I call these *event messages* and they're the only ones being stored in databases. As for now, the device is flashed for publishing data every second and to store ALL of these messages - even if so be a S3 - felt a bit excessive.
+I call these *event messages* and they're the only ones being stored in databases. As for now, the device is flashed for publishing data every second. Storing ALL of these messages - even if so be in a S3 - felt a bit excessive.
 
 This binary value of *update_event* is calculated, by old habit, in the source code of my device but I'm quite sure a service like *IoT events* had been handy in this matter. From the documentation I've even (rather of course) noticed there's logic available for utilizing a state machine.
 
