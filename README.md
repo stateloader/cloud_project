@@ -1,56 +1,84 @@
-Project: Waste Management
+Project: IoT Waste Management
 
-
-![tlted_latest drawio](https://user-images.githubusercontent.com/78800629/206994519-94a6e52e-b879-4147-b2f6-d3783c4bdd7e.png)
+![waste_management](https://user-images.githubusercontent.com/78800629/207486314-2bf965a8-c95c-44e7-95de-c38345326658.png)
 
 	Background
-	
-This is an assignment in IoT and cloud services where I've used a distance sensor for publishing data about it's state into an architecture built out of some of all services AWS has to offer.
+
+This is part of an assignment in the course **IoT and cloud Services** where I've used a distance sensor for reading current waste level in my household bin. I've since over a year been studying IoT - hence grown tired of playing around with the temp- and humid sensor - and thought this was a brilliant idea. However, figure out a use case turned out to be way more difficult than I first thought given the circumstances.
 
 	Use Case
-    
-This part turned out to be quite difficult. Close my eyes and outsource the looking part to a led device/dashboard of some sort to tell if it's time to empty the vessel or not is cool but maybe not attached with the most solid use case. Because it's required to implement an API and utilize fetched data, somehow and somewhere, for visualization, I've taken a imaginary approach where I'm a Waste Management Company.
 
-After a class mate told me how Waste Management in Trelleborg dispatch vessels more frequent as the temperature rises I've utilized a temp API for something similar in this project. Yes, it had probably been easier to just connect a temp sensor in circuit with my distance sensor for this but it does job! 
+Closing my eyes while throwing the waste and let an interface of some sort remind me when it's time to empty the bin is neat but not really much of a use case. I had to use a little bit of imagination in this one why I've built my architecture trough the lenses of a Waste Management Company. I'm going to refer to this entity as *WMC* in the documentation.
+
+The idea is simple: a device will publish data to the cloud in which it's being processed and stored. Vessels that's full will trigger the cloud to send a SMS about which vessel, and where, to a garbage collector. We're required to implement an API in this assignment, and after a class mate told me about how Waste Management in southern Sweden dispatch vessels more frequent as the temperature rises I've utilized a temp API for something similar in this project. 
+
 	(1) Hardware
 
-**MDevice**, from here and throughout the documentation refered to as "the thing", "prototype" or "the device", is an ESP8266 (Wemos D1 mini) in circuit with a distance sensor (HC-SR05). The device is placed over a given vessel (my trash can) in a garbage room (the area under my sink), one of many within an imaginary district (my apartment).
+**MDevice**, "the device", is an ESP8266 (Wemos D1 mini) in circuit with a distance sensor (HC-SR05). The device is placed over a vessel (my trash can) in a garbage room (the area under my sink) within a given district (my apartment). 
 
-<< Picture by deadline >>
+	(2) Software and API
 
-	(2) Software
-
-My architecture is built from the device up to the cloud and into the *AWS IoT Core*. For in-depth explanation, go ahead and read the source code, but its core concept involves the variables "sensor_value* and *vessel_state* whereas *sensor_value* will determine current *vessel_state*. If a change occurs, the *update_event* variable will be set and trigger a *rule* which triggers the "the core" to insert this sample into *DynamoDB*. There are 3 vessel states:
-|State | Definition |
+Most logic in place revolves around the *sensor_value*, *vessel_state* and *update_event* variables whereas sensor_value will determine current vessel_state. If a change occurs, the update_event variable will be set and invoke rules that going to trigger the "the core" to execute some actions. There are 3 of these vessel states:
+|  state|definition  |
 |--|--|
-|  green|vessel empty|
-|  yellow|vessel half full|
-|  red|vessel full|
+|  green| vessel empty  |
+|  yellow| vessel half full  |
+|  red| vessel full  |
 
-For example; a *sensor_value* between 35-50 cm, *might* be conditionally attached to state green, 20 - 34 cm to yellow and 0-19 cm red. I wrote *might* because these threshold values are not constants flashed into the **MDevice** but configurated from the cloud. I've implemented this feature for "long term" purposes.
+For example; a sensor_value between 35-50 cm might be conditionally attached to state green, 20 - 34 cm to yellow and 0-19 cm red. I wrote *might* because these threshold values are not flashed constants but configurated from the cloud. I've implemented this feature for "long term" purposes.
 
-After all, vessels come in different sizes and shapes while new standards come and go. Instead of making, in this regard, the thing obsolete for every change I thought it might be handy to just publish, "update", new threshold values for all devices concerned through MQTT commands from the cloud. "Ish".
+After all, vessels come in different sizes and shapes while new standards come and go. Instead of making, in this regard, the thing kinda obsolete for every vessel change I thought it might be handy to just publish - "update" - new threshold values for all devices concerned through MQTT commands from the cloud.
+    
+As API goes I'm utilizing temperatur.nu. They're awesome. The device will request temp data every four hour from where I'm living (the "district") and store this value. If the reading is > 30, we're dealing with temperatures too high for taking "state yellow" into account. I.e: dispatch requests will occur more often.
 
-<< Picture by deadline >>
+The flash itself is done from the Arduino-IDE using ESP8266 as target within the board manager. And yes, it's probably quite a Quasimodo solution in this context but I just didn't manage to make any API calls from the cloud. First time dealing with cloud services, sure, but such easy task shouldn't be a problem.
 
-	(3) Security
+	(3) Device Gateway
 
-Unlike the phony device under my sink, a real Waste Management Company might oversee thousands of devices and probably think twice before copy/pasting this kind of sensitive information and burn it to the metal. Guess *AWS Key Management Service (AWS KMS)* might suit this second thought well; a service that centralizes security management while - among others - pairing identities with certificates and keys digitally and encrypt- and decrypts data flows.
+Entry point for connected devices where checks and verification being done before maintenance of a (hopefully) long lived connection is established (MQTT). However, unlike the device under my sink, *WMC* might oversee thousands of devices and probably think twice before copy/pasting and burn this kind of sensitive information to the metal. More on this later.
 
-<< Picture by deadline >>
-	
 	(4) IoT Policies
 
-Configurations for establishing MQTT connection with "the core's" message broker. Specifies which resources and actions being allowed for a device. These policies governs the device(s) shadows as well, something I've illustrated as a concept in my diagram but not implemented myself yet. A shadow is a digital representation of a device and will store, query, ongoing and desired actions until a device that's, for example offline, going online again.
+Services for establishing MQTT connection with "the core's" message broker. Specifies which resources and actions being allowed for a device. These policies governs the device(s) shadows as well, something I've illustrated as a concept in my diagram but not implemented. Not yet at least.
 
-I've let the device be able to publish and subscribe to the cloud. This will ... [documentation ongoing]
+A shadow is a digital representation of a device and will store, query, actions and desired states until a device that's - for example - is dead going online again. When it comes to "updating" threshold values on my devices, there's far from any interface in place why I've used *AWS MQTT client test* tool for waking my thing up.
 
-<Picture by deadline>
+![config](https://user-images.githubusercontent.com/78800629/207476023-9257b320-d652-45a7-b293-bc4f4c063e0b.png)
 
-	(5) IoT Topics
+    (5) IoT Topics
     
-The MQTT brooker identifies messages from the topics they're sent to and received from. As for my fictive waste manager company I've implemented a region/district/garbage_room/device_id/(pub/sub) approach.
-	
-	(6) IoT Rules
-	
-	[...]
+The MQTT brooker identifies messages from the topics they're sent and received from. As for "WMC", I've implemented a region/district/garbage_room/vessel/device_id/"pub/sub" hierachy.
+
+    (6) IoT Rules
+
+Service that's filtering and take actions based on content sent from a devise. The filtering is done by parsing incoming messages using SQL syntax. You enter this snippet when creating (or updating) a rule. I've created rules that forwarding every message that has the attribute *update_event* set to a dynamoDB table (warm path) and a S3 bucket (cold path).
+
+I call these *event messages* and they're the only ones being stored in databases. As for now, the device is flashed for publishing data every second and store ALL of these - even in a bucket - felt a bit excessive.
+
+This binary value of *update_event* is calculated, by old habit, in the source code of my device but I'm quite sure a service like *IoT events* had been handy in this matter. From the documentation I've even (rather of course) noticed there's logic available for utilizing a state machine.
+
+![put_dynamo](https://user-images.githubusercontent.com/78800629/207476242-c268f13d-ad7b-4bfa-9dd0-a8fcf1f43ea7.png)
+
+	(7) AWS KMS och IAM
+
+Unlike when I'm dealing with a prototype against my household bin, *AWS Key Management Service (AWS KMS)* would suit an upscaled - real - interpretation of my architecture better. This service centralizes security management while - among other - taking care of validations, pairing identities with certificates/keys digitally and encrypting/decrypting data flows.
+
+*AWS Identity and Access Management*, IAM, makes it possible to manage which services and resources users/employee's has access to. There's, however, only  been one device connected during this assignment and even though I've a large company in mind, one user except root felt more than enough in this exercise.
+
+![employee](https://user-images.githubusercontent.com/78800629/207476308-fa8f7191-3c03-43c9-8fcd-c222820bdf50.png)
+
+	(8) Cold Path (9) Warm Path
+   
+My original plan for these guys didn't work out as expected. In short, every *event message* from this day and until the end of time would had been thrown into the bucket while DynamoDB's main purpose was to visualize ongoing, short term activity using "quicksight* for people in the office to enjoy.
+
+Sure, stuff is being written to both identities but that's about it. Regional settings doesn't allow me to visualize it (or I've failed to understand how). I've plotted lambdas with a bridge between them to underscore possibilities, such like augmenting new and old data to your hearts content for insights. As the databanks grow run it through models - I've noticed AWS offering services for this -  
+
+	(10) Hot path
+    
+While the office people hasn't nothing to do except updating devices all day using the *AWS MQTT client test* I've at least got logic in place - in some sense a visualization in its own right - to alarm waste collectors when a vessel is ready to be emptied.
+
+I'm utilizing *Amazon SNS notification service* for this task. I've created a rule WHERE messages with the *update_event* set AND which just turned red tell ASNS to send me/made up garbage collectors the happy news.
+
+In a real case scenario, these text messages would preferley be sent to the closest collector from where the vessel (and the device) is located. That's for next time.
+
+![sms_update](https://user-images.githubusercontent.com/78800629/207476506-ad2a5576-f1ce-43cc-81f7-1f00a32e5f1f.png)
