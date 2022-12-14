@@ -73,17 +73,15 @@ Unlike when I'm flashing "secrets" to the prototype, *AWS Key Management Service
 
 	(8) Cold Path (9) Warm Path
    
-My original plan for these guys didn't work out as expected. In short, every *event message* from this day and until the end of time would had been thrown into the bucket while DynamoDB's main purpose was to visualize ongoing, short term activity using "quicksight* for people in the office to enjoy.
-
-Sure, stuff is being written to both identities but that's about it. Regional settings doesn't allow me to visualize it (or I've failed to understand how). I've plotted lambdas with a bridge between them to underscore possibilities, such like augmenting new and old data to your hearts content for insights. For now,  
+My original plan for these guys didn't work out as expected. In short, every *event message* from this day and until the end of time would had been thrown into the bucket while DynamoDB's main purpose was to visualize ongoing, short term activity using "quicksight* for the imaginary employees in the office to enjoy. Sure, data is written to both identities but that's about it. Regional settings doesn't allow me to visualize it (or I've failed to understand how).
 
 ![dynamodb](https://user-images.githubusercontent.com/78800629/207492224-00c3df54-e837-42c6-981b-3d5a1a66fbe9.png)
 
 	(10) Hot Path
     
-While the office people haven't anything to do except updating devices all day using the *AWS MQTT client test* I've at least functionality - in some sense a visualization in its own right - to alarm waste collectors when a vessel is ready to be emptied.
+While the office people haven't anything to do except updating devices all day using the *AWS MQTT client test* I've at least functionality - in some sense a visualization in its own right - in place to alarm waste collectors when a vessel is ready to be emptied.
 
-I'm utilizing *Amazon SNS notification service* for this task. I've created a rule where messages that just changed vessel state to red tell ASNS to send me/made up garbage collectors the happy news.
+I'm utilizing *Amazon SNS notification service* for this task. I've created a rule where messages that just changed vessel state from yellow to red tells ASNS to send me/made up garbage collectors the happy news.
 
 In a real case scenario, these text messages would preferley be sent to the closest collector from where the vessel (and the device) is located. That's for next time.
 
