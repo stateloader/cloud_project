@@ -81,6 +81,6 @@ While the office people haven't anything to do except updating devices all day u
 
 I'm utilizing *Amazon SNS notification service* for this task. I've created a rule where messages that just changed vessel state from yellow to red tells ASNS to send me/made up garbage collectors the happy news.
 
-In a real case scenario, these text messages would preferley be sent to the closest collector from where the vessel (and the device) is located. That's for next time.
+In a real case scenario, these text messages would preferley be sent to the closest collector from where the vessel (and the device) is located. *Amazon Location Service* might be something to consider when implementing such logic. If nothing else, at least make sure to send messages in a little more welcoming format than raw Json.
 
 ![sms_update](https://user-images.githubusercontent.com/78800629/207476506-ad2a5576-f1ce-43cc-81f7-1f00a32e5f1f.png)
