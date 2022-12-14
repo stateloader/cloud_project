@@ -32,7 +32,7 @@
 #define VESSEL_YEL 1
 #define VESSEL_RED 2
 
-#define EVENT_TIMER 2000 // Half a minute is given to check if triggered "cross threshold action" was fake or not.
+#define EVENT_TIMER 30000 // Half a minute is given to check if triggered "cross threshold action" was fake or not.
 #define API_TIMER 1000 * 60 * 240 // Read temp from API every 4 hour.
 
 BearSSL::X509List aws_crt(AWS_CRT);
