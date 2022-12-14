@@ -35,6 +35,8 @@ Yes, it's probably quite a Quasimodo solution in this context to read an api fro
 
 The flash itself is done from the Arduino-IDE using ESP8266 as target within the board manager.
 
+![check_states](https://user-images.githubusercontent.com/78800629/207491443-39f6edac-b5e6-4a5d-8e04-bfe902c1eb0f.png)
+
 	(3) Device Gateway
 
 The entry point for connected devices where checks and verifications being done before a (hopefully) long lived connection is established (MQTT). However, unlike the device under my sink, *WMC* might oversee thousands of devices and probably think twice before copy/pasting and burn this kind of sensitive information straight to the metal. More on this later.
@@ -73,7 +75,7 @@ Unlike when I'm flashing "secrets" to the prototype, *AWS Key Management Service
    
 My original plan for these guys didn't work out as expected. In short, every *event message* from this day and until the end of time would had been thrown into the bucket while DynamoDB's main purpose was to visualize ongoing, short term activity using "quicksight* for people in the office to enjoy.
 
-Sure, stuff is being written to both identities but that's about it. Regional settings doesn't allow me to visualize it (or I've failed to understand how). I've plotted lambdas with a bridge between them to underscore possibilities, such like augmenting new and old data to your hearts content for insights. As the databanks grow run it through models - I've noticed AWS offering services for this -  
+Sure, stuff is being written to both identities but that's about it. Regional settings doesn't allow me to visualize it (or I've failed to understand how). I've plotted lambdas with a bridge between them to underscore possibilities, such like augmenting new and old data to your hearts content for insights.
 
 	(10) Hot path
     
