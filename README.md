@@ -65,6 +65,8 @@ This binary value of *update_event* is calculated, by old habit, in the source c
 
 Unlike when I'm flashing "secrets" to the prototype, *AWS Key Management Service (AWS KMS)* would suit an upscaled - real - interpretation of my architecture better. This service centralizes security management while - among other - taking care of validations, pairing identities with certificates/keys digitally and encrypting/decrypting data flows.
 
+Furthermore, AWS has tools for machine learning in place making it possible for internal processes to "learn devices", which is legit or not, if anyone tries to breach into the system. This is by all means true in a solution where secrets has been flashed to the device itself as in my case.
+
 *AWS Identity and Access Management*, IAM, makes it possible to manage which services and resources users/employee's have access to. There's, however, as we know only been one device connected during my experiments and even though I've a large company in mind, one user except root felt more than enough in this project.
 
 ![employee](https://user-images.githubusercontent.com/78800629/207476308-fa8f7191-3c03-43c9-8fcd-c222820bdf50.png)
