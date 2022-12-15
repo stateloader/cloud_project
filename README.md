@@ -84,3 +84,15 @@ I'm utilizing *Amazon SNS notification service* for this task. I've created a ru
 In a real case scenario, these text messages would preferley be sent to the closest collector from where the vessel (and the device) is located. *Amazon Location Service* might be something to consider when implementing such logic. If nothing else, at least make sure to send messages in a little more welcoming format than raw Json.
 
 ![sms_update](https://user-images.githubusercontent.com/78800629/207476506-ad2a5576-f1ce-43cc-81f7-1f00a32e5f1f.png)
+
+	Visualization
+
+![bar_state](https://user-images.githubusercontent.com/78800629/207805425-442c67f5-9cde-49c0-aa31-fd91a1710fba.png)
+
+This is how some experimental samples looks like in a barplot where the states has been lined up until a red state - "empty the bin" - is reached.
+
+Now, this is plotted in an *ordered* fashion. Read from a CSV, itself downloaded from the dynamoDB and uploaded to *AWS QuickSight* (due to reagional whereabouts). What's actually going on is me playing around with my device, testing *update_state* functionality between green and yellow before going red.
+
+The assignment requires visuals of the data in *any* kind and this is it. However, *WMC* had had a webb application in place where responsibility to oversee specific *vessel_state* is assigned to employees utilizing IAM polycies and permissions. For making this possible would I, for example, let lambdas run over the tables to fetch specific regions, districts, rooms and vessels queried conditionally with linkage governed by IAM polycies.
+
+I'd plans for setting up a *very* simple flask app or something and feed it with dynamo data. Here, visualization had been plotted in a more specific way; something like a coloured circle for current state and some historical states under it.
