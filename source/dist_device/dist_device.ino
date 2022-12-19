@@ -1,11 +1,10 @@
 #include "configs.h"
 
-// I've put all functions in this .ini-file because I don't really know how to import logic
-// from my own custom made modules within the Arduino ecosystem without being yelled at by
-// either the IDE or the compiler, or both.
+// I've put all functions in this .ini-file because I don't really know how to import logic from
+// my own custom made modules within the Arduino ecosystem, at least not without being yelled at
+// by either the IDE or the compiler, or both.
 
-// This flash runs in yolo-mode with no serious error-handling in place at all yet. I've
-// utilized stdint.h mainly because of my kink for the uint8_t type.
+// This flash runs in yolo-mode with no serious error-handling in place at all.
 
 time_t datetime;
 
@@ -24,8 +23,8 @@ uint8_t vessel_state  = VESSEL_GRN;
 uint8_t device_state  = DEVICE_CONNECT;
 
 static void mqtt_publish(void) {
-
-// Publish 'vessel_state', 'sensor_value', 'update_event' and temp to the cloud.
+// Publish 'vessel_state', 'sensor_value', 'update_event', 'tmpapi_value' and 'heatwv_event'
+// to the cloud.
 
   delay(1000);
   char mqtt_buff[512];
@@ -35,7 +34,7 @@ static void mqtt_publish(void) {
   doc["sensor_value"] = sensor_value;
   doc["update_event"] = update_event;
   doc["tmpapi_value"] = temperature_API;
-
+  doc["heatwv_event"] = heatwv_event;
 
   serializeJson(doc, mqtt_buff);
   device.publish(TOPIC_PUB, mqtt_buff);
@@ -103,6 +102,8 @@ static uint8_t connect_aws(void) {
 }
 
 static uint8_t tempget_api(void) {
+// Calls API (temperatur.nu) and fetches temp value from a sensor close to where I'm
+// living (i.e: "the vessel").
 
   DynamicJsonDocument doc(2048);
 
@@ -124,26 +125,28 @@ static uint8_t tempget_api(void) {
 }
 
 static uint8_t connect_routine(void) {
-// "Wrapper" for connectivity-logic. 'state-values' in place for error-handling later on.
+// "Wrapper" for connectivity-logic. 'retval' in place for implementaton of error handeling
+// later on.
 
-  uint8_t conn_states = 0;
+  uint8_t retval = 0;
 
-  conn_states += connect_lan();
-  conn_states += connect_ntp();
-  conn_states += connect_aws();
-  conn_states += tempget_api();
+  retval += connect_lan();
+  retval += connect_ntp();
+  retval += connect_aws();
+  retval += tempget_api();
 
-  if (conn_states == 4)
+  if (retval == 4)
     return 1;
   return 0;
 }
 
 static uint8_t configs_routine(void) {
-// After the sensor has been attached to a vessel, is up and running and connected to the cloud,
-// it's up to WMC:s employees to "config" threshold values for it. As long these values hasn't
+// After a sensor has been attached to a vessel, is up and running and connected to the cloud,
+// it's up to "WMC:s employees" to "config" the threshold values. While these values hasn't
 // been set, the device won't jump to state "DEVICE_ONGOING" and send sensor values.
 
-  device.loop();
+  device.loop(); // C++ magic. If a MQTT message is received there will be a callback.
+
   if (threshold_TMP < 1 || threshold_YEL < 1 || threshold_RED < 1 ) {
     Serial.println("waiting for threshold configs...");
     delay(2000);
@@ -155,7 +158,7 @@ static uint8_t configs_routine(void) {
 }
 
 static void sensor_read(void) {
-// Reads current 'sensor_value'.
+// Read current 'sensor_value'.
 
   uint64_t duration = 0;
 
@@ -174,23 +177,36 @@ static void sensor_read(void) {
 }
 
 static void vessel_eval(void) {
-// Assigns 'vessel_value' based on sensor value relative to given thresholds. 
+// Assigns 'vessel_value' based on 'sensor_value' relative to given thresholds.
 
-  if (sensor_value <= threshold_RED) {        // If sensor_val lesser or equal red, empty...
+// If sensor_val is lesser or equal "red", distance to the waste is very low (i.e: full).
+// Else if sensor_val is lesser than "yellow", distance to the waste is very high (i.e: empty).
+// Else, the sensor's value is within the boundaries for state "yellow" (i.e: half full).
+
+  heatwv_event = (temperature_API >= threshold_TMP) ? 1 : 0; // Trinary check if "high temp mode".
+                                                             // If so, set 'heatwv_event'.
+  if (sensor_value <= threshold_RED) {
     vessel_state = VESSEL_RED;
-  } else if (sensor_value > threshold_YEL) {  // else if larger than yel, it is green.
+  } else if (sensor_value > threshold_YEL) {
     vessel_state = VESSEL_GRN;
   } else {
-    vessel_state = VESSEL_YEL;                // else yellow.
+    // If the API has sent a temp >= 'treshold_TMP', there's no yellow state at all until the api
+    // sends a temp_value < 'treshold_TMP'.
+    if (!heatwv_event) {
+      vessel_state = VESSEL_YEL;
+    } else {
+      vessel_state = VESSEL_RED;
+    }
   }
 }
 
 static void update_eval(void) {
-// Evaluates/checks if last 'sensor_value' has reached/passed a threshold. If so, this might
-// just be temporarly as people throwing stuff or the sensor has catched a fly. I've
-// implemented a 30 sec 'event_buffer' for this reason. If 'last_vessel_state' still
-// differ from 'vessel_state' after this period, a message with the 'update' attribute
-// set will be published to the cloud.
+// Evaluates/checks if last 'sensor_value' has reached/passed a threshold. If so, this might just be
+// temporary as people throwing stuff or the sensor has catched a fly.
+
+// For this reason, I've implemented a 30 sec 'event_buffer'. If 'last_vessel_state' still differ
+// from 'vessel_state' after this period, a message with the 'update' attribute set will be published
+// to the cloud, in turn triggering action among used AWS services.
 
   static uint64_t event_time_stamp   = 0;
   static uint8_t  prev_vessel_state  = 0;
@@ -219,12 +235,29 @@ static void update_eval(void) {
   }
 }
 
+static void getapi_eval(void) {
+// As for now, variable 'init_stamp' stores a time stamp from last api call. If
+// 'millis()' - this value equals or is grather than API_TIMER, do another call.
+
+  static uint64_t init_stamp = 0;
+  
+  if (init_stamp) {
+    if (millis() - init_stamp >= API_TIMER) {
+      init_stamp = millis();
+      tempget_api();
+    }
+  } else {
+    init_stamp = millis();
+  }
+}
+
 static uint8_t ongoing_routine(void) {
 // "Wrapper" for "ongoing-logic".
 
-  sensor_read();
-  vessel_eval();
-  update_eval();
+  sensor_read();    // read sensor value.
+  getapi_eval();    // check timer for api call.
+  vessel_eval();    // check thresholds for 'vessel_state' updates (starts timer if so).
+  update_eval();    // check, when 
   mqtt_publish();
 
   if (!device.connected())
@@ -233,7 +266,7 @@ static uint8_t ongoing_routine(void) {
 }
 
 static void device_driver(void) {
-// Rather optimistic main driver/statemachine.
+// Rather optimistic main driver/statemachine as for now.
 
   switch(device_state) {
 
