@@ -26,13 +26,12 @@
 #define DEVICE_CONNECT 0  // Connect to the cloud.
 #define DEVICE_CONFIGS 1  // Wait for threshold values from lazy EMC employes.
 #define DEVICE_ONGOING 2  // Read, evaluate. Repeat.
-#define DEVICE_APICALL 3  // Read API every now and then.
 
 #define VESSEL_GRN 0
 #define VESSEL_YEL 1
 #define VESSEL_RED 2
 
-#define EVENT_TIMER 30000 // Half a minute is given to check if triggered "cross threshold action" was fake or not.
+#define EVENT_TIMER 1000 * 30     // Half a minute is given to check if triggered "threshold action" was fake or not.
 #define API_TIMER 1000 * 60 * 240 // Read temp from API every 4 hour.
 
 BearSSL::X509List aws_crt(AWS_CRT);
@@ -45,13 +44,13 @@ HTTPClient http;
 WiFiClientSecure net;
 PubSubClient device(net);
 
-//Used during code tests with AWS MQTT test client .
+// Used during code tests with AWS MQTT test client. Sends "vessel configs" back to the device.
 
 /*
 {
   threshold_TMP : 30,
-  threshold_YEL : 10,
-  threshold_RED : 20
+  threshold_YEL : 20,
+  threshold_RED : 5
 }
 
 +/+/+/+/+/pub
